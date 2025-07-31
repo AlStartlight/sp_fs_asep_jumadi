@@ -1,11 +1,21 @@
 "use client";
 import { useBoards } from "@/hook/useBoard";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar , AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import  Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User, Settings, HelpCircle } from "lucide-react";
+import { signOut } from "next-auth/react";
 export default function KanbanProject({ session,children }: { session: any, children?: React.ReactNode }) {
   const { boards, addBoard } = useBoards();
   const [newName, setNewName] = useState("");
@@ -62,7 +72,7 @@ export default function KanbanProject({ session,children }: { session: any, chil
                     placeholder="Board name"
                     value={newName}
                     onChange={e => setNewName(e.target.value)}
-                    className="dark:text-white text-white"
+                    className="dark:text-white text-black"
                   />
                   <Button onClick={handleCreate}>Create</Button>
                 </div>
@@ -74,8 +84,55 @@ export default function KanbanProject({ session,children }: { session: any, chil
 
       {/* Profile */}
       <div className="absolute top-4 right-6">
-        <Avatar className="h-8 w-8 bg-zinc-700" />
-      </div>
+             <DropdownMenu>
+               <DropdownMenuTrigger asChild>
+                 <Avatar className="h-8 w-8 bg-zinc-700 cursor-pointer hover:bg-zinc-600 transition-colors">
+                   <AvatarFallback className="text-white font-medium">
+                     {session?.user?.name?.slice(0, 2).toUpperCase()}
+                   </AvatarFallback>
+                 </Avatar>
+               </DropdownMenuTrigger>
+     
+               <DropdownMenuContent className="w-56 bg-zinc-800 border-zinc-700 text-zinc-200">
+                 <DropdownMenuLabel className="flex items-center gap-3">
+                   <div className="bg-zinc-700 rounded-full p-2">
+                     <User size={16} />
+                   </div>
+                   <div>
+                     <p className="font-medium text-white">{session?.user?.name}</p>
+                     <p className="text-xs text-zinc-400">{session?.user?.email}</p>
+                   </div>
+                 </DropdownMenuLabel>
+     
+                 <DropdownMenuSeparator className="bg-zinc-700" />
+     
+                 <DropdownMenuItem className="flex items-center gap-3 hover:bg-zinc-700 cursor-pointer focus:bg-zinc-700">
+                   <User size={16} className="text-zinc-400" />
+                   <span>Profile</span>
+                 </DropdownMenuItem>
+     
+                 <DropdownMenuItem className="flex items-center gap-3 hover:bg-zinc-700 cursor-pointer focus:bg-zinc-700">
+                   <Settings size={16} className="text-zinc-400" />
+                   <span>Settings</span>
+                 </DropdownMenuItem>
+     
+                 <DropdownMenuItem className="flex items-center gap-3 hover:bg-zinc-700 cursor-pointer focus:bg-zinc-700">
+                   <HelpCircle size={16} className="text-zinc-400" />
+                   <span>Help & Support</span>
+                 </DropdownMenuItem>
+     
+                 <DropdownMenuSeparator className="bg-zinc-700" />
+     
+                 <DropdownMenuItem
+                   className="flex items-center gap-3 hover:bg-red-500/10 cursor-pointer text-red-400 focus:text-red-300 focus:bg-red-500/10"
+                   onClick={() => signOut({ callbackUrl: "/login" })}
+                 >
+                   <LogOut size={16} />
+                   <span>Log out</span>
+                 </DropdownMenuItem>
+               </DropdownMenuContent>
+             </DropdownMenu>
+           </div>
     </div>
   );
 }

@@ -32,7 +32,7 @@ model Task {
   id           String   @id @default(cuid())
   title        String
   description  String?
-  status       String   @default("pending")
+  status       String   @default("todo")
   projectId    String
   project      Project  @relation(fields: [projectId], references: [id])
   assigneeId   String?

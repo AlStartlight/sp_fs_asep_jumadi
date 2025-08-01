@@ -21,25 +21,39 @@ export async function POST(req: NextRequest) {
   }
 }
 
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-
-  if (!session || !session.user?.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
     const projects = await prisma.project.findMany({
       where: {
-        ownerId: session.user.id,
+        OR: [
+          { ownerId: userId },                     // sebagai owner
+          { members: { some: { userId: userId } } } // sebagai member
+        ]
       },
       include: {
         owner: true,
+        members: {
+          select: {
+            user: {
+              select: { id: true, name: true, email: true }
+            },
+            role: true
+          }
+        }
       },
+      orderBy: { updatedAt: 'desc' }
     });
 
     return NextResponse.json(projects);
   } catch (e) {
+    console.error('Failed to fetch projects:', e);
     return NextResponse.json({ error: 'Failed to fetch projects' }, { status: 500 });
   }
 }

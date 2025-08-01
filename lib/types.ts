@@ -9,7 +9,11 @@ export interface User {
   assignedTasks: Task[];
   memberships: Membership[];
 }
-
+export interface Suggestion {
+  id: string;
+  name: string;
+  email: string;
+}
 export interface Project {
   id: string;
   name: string;

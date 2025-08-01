@@ -55,7 +55,7 @@ export default function KanbanProject({ session,children }: { session: any, chil
           </div>
           <div className="flex gap-4 flex-wrap">
             {boards.map(b => (
-            <Link legacyBehavior href={`/dashboard/${b.id}`} key={b.id}>
+            <Link  href={`/dashboard/${b.id}`} key={b.id}>
               <div key={b.id} className="bg-zinc-800 rounded-md w-44 h-20 flex items-end p-2 cursor-pointer hover:bg-zinc-700">
                 <div className="font-semibold">{b.name}</div>
               </div>

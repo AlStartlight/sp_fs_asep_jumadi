@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Autosuggest from 'react-autosuggest';
 import { useDebounce } from '@uidotdev/usehooks';
@@ -10,8 +12,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-hot-toast"; // atau ganti sesuai lib toast yang kamu gunakan
+import { toast } from "react-hot-toast";
 import { useUserStore } from '@/store/useUserStore';
+import { useRouter } from 'next/navigation';
 
 export type User = { id: string; name: string; email: string };
 export interface Suggestion { id: string; name: string; email: string }
@@ -27,13 +30,16 @@ export default function InviteMemberDialog({
   open,
   setOpen
 }: InviteMemberDialogProps) {
+    const router = useRouter();
   const [value, setValue] = useState('');
   const [rawQuery, setRawQuery] = useState('');
   const debouncedQuery = useDebounce(rawQuery, 300);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [selected, setSelected] = useState<Suggestion | null>(null);
   const [loading, setLoading] = useState(false);
+  const addUser = useUserStore((state) => state.addUser);
 
+  // Fetch suggestions tiap query berubah
   useEffect(() => {
     async function fetchSuggestions() {
       if (debouncedQuery.length < 2) {
@@ -52,7 +58,7 @@ export default function InviteMemberDialog({
         setSuggestions([]);
       }
     }
-    
+
     fetchSuggestions();
   }, [debouncedQuery]);
 
@@ -62,11 +68,9 @@ export default function InviteMemberDialog({
     setSelected(null);
   };
 
-  const onSuggestionsFetchRequested = () => { /* dikendalikan oleh useEffect */ };
+  const onSuggestionsFetchRequested = () => {};
   const onSuggestionsClearRequested = () => setSuggestions([]);
-
   const getSuggestionValue = (s: Suggestion) => s.name;
-
   const renderSuggestion = (s: Suggestion) => (
     <div className="px-4 py-2 hover:bg-gray-100">
       <div className="font-medium">{s.name}</div>
@@ -79,6 +83,7 @@ export default function InviteMemberDialog({
     setValue(suggestion.name);
   };
 
+  // Invite handler
   const handleInvite = async () => {
     if (!selected) return;
     setLoading(true);
@@ -88,9 +93,20 @@ export default function InviteMemberDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: selected.email }),
       });
-      if (!res.ok) throw new Error((await res.json()).error || 'Invite gagal');
-      toast.success(`${selected.name} invited!`);
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Invite gagal');
+      }
+
+      // Tambahkan user ke global store
+      addUser(selected);
+     toast.success(`${selected.name} invited!`);
+
+    router.refresh(); // Refresh page to reflect changes
+      // Reset form
       setOpen(false);
+      
       setValue('');
       setRawQuery('');
       setSelected(null);
@@ -103,7 +119,7 @@ export default function InviteMemberDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{/* tombol trigger disini (jika ingin) */}</DialogTrigger>
+      <DialogTrigger asChild>{/* tombol trigger */}</DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Invite Member</DialogTitle>

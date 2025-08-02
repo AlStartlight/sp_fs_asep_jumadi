@@ -16,7 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User, Settings, HelpCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
-export default function KanbanProject({ session,children }: { session: any, children?: React.ReactNode }) {
+import { Session } from "@/lib/types";
+
+export default function KanbanProject({ session,children }: { session: Session, children?: React.ReactNode }) {
   const { boards, addBoard } = useBoards();
   const [newName, setNewName] = useState("");
 

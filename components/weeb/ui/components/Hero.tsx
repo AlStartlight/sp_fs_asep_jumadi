@@ -14,7 +14,7 @@ const HeroPages = () => {
 </h1>
 
     <p className='text-gray-300 text-center mt-4 mx-auto max-w-2xl'>
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aperiam, neque! Quod ut iure explicabo, blanditiis accusamus quas repellat odio cumque velit! Optio itaque beatae iure est ea fugiat ullam eos?
+       Treeloo is a collaborative project management app designed for multi-user teams, enabling effective execution and efficient workflows. It fosters real-time collaboration by providing a unified workspace where members can simultaneously view, edit tasks, share files, and communicate within project contexts, ensuring shared visibility of goals and responsibilities. 
     </p>
     <div className='flex flex-row justify-center items-center gap-4 mt-8'>
         <Link href="/register">

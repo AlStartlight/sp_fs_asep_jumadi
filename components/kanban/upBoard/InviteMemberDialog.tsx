@@ -62,7 +62,7 @@ export default function InviteMemberDialog({
     fetchSuggestions();
   }, [debouncedQuery]);
 
-  const onChange = (_: any, { newValue }: any) => {
+  const onChange = (_: React.FormEvent<HTMLInputElement>, { newValue }: { newValue: string }) => {
     setValue(newValue);
     setRawQuery(newValue);
     setSelected(null);
@@ -78,7 +78,7 @@ export default function InviteMemberDialog({
     </div>
   );
 
-  const onSuggestionSelected = (_: any, { suggestion }: { suggestion: Suggestion }) => {
+  const onSuggestionSelected = (_: React.FormEvent<HTMLInputElement>, { suggestion }: { suggestion: Suggestion }) => {
     setSelected(suggestion);
     setValue(suggestion.name);
   };
@@ -110,8 +110,8 @@ export default function InviteMemberDialog({
       setValue('');
       setRawQuery('');
       setSelected(null);
-    } catch (err: any) {
-      toast.error(err.message || 'Terjadi kesalahan.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan.');
     } finally {
       setLoading(false);
     }

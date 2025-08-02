@@ -20,5 +20,9 @@ export default async function DashboardPage() {
     );
   }
 
-  return <KanbanDashboard  session={session} children={<Sidebar/>} />;
+  return (
+    <KanbanDashboard session={session}>
+      <Sidebar />
+    </KanbanDashboard>
+  );
 }

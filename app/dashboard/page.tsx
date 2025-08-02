@@ -2,7 +2,6 @@
 import '@/app/globals.css'
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import KanbanDashboard from "@/components/kanban/KanbanBoard";
 import KanbanProject from '@/components/kanban/KanbanProject';
 import Sidebar from '@/components/kanban/Sidebar';
 
@@ -21,5 +20,9 @@ export default async function DashboardPage() {
     );
   }
 
-  return <KanbanProject session={session} children={<Sidebar/>} />;
+  return (
+    <KanbanProject session={session}>
+      <Sidebar />
+    </KanbanProject>
+  );
 }

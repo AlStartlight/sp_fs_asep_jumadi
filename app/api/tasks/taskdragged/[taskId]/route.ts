@@ -54,7 +54,7 @@ export async function PUT(
       },
     });
     return NextResponse.json(updated);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to update task status:', err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }

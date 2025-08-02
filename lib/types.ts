@@ -9,6 +9,16 @@ export interface User {
   assignedTasks: Task[];
   memberships: Membership[];
 }
+
+export interface Session {
+  user: {
+    id: string;
+    email: string;
+    name?: string | null;
+  };
+  expires: string;
+}
+
 export interface Suggestion {
   id: string;
   name: string;

@@ -87,9 +87,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(task, { status: 201 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to create task:", error);
-    if (error.code === "P2003") {
+    if (error instanceof Error && 'code' in error && error.code === "P2003") {
       return NextResponse.json(
         { error: "Invalid foreign key constraint" },
         { status: 400 }
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to create task",
-        details: error.message || "Unknown error"
+        details: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
     );

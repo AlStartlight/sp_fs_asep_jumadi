@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Task } from "@/lib/types";
+import { Task, Session, Project, User } from "@/lib/types";
 import { PlusIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import {
@@ -19,7 +19,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,10 +37,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, HelpCircle } from "lucide-react";
+import { LogOut, User as UserIcon, Settings, HelpCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
-import { useDebounce } from '@uidotdev/usehooks';
 import InviteMemberDialog from "./upBoard/InviteMemberDialog";
 
 const columns = [
@@ -54,7 +52,7 @@ export default function KanbanDashboard({
   session,
   children,
 }: {
-  session: any;
+  session: Session;
   children?: React.ReactNode;
 }) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -66,15 +64,10 @@ export default function KanbanDashboard({
   const [openDialogMail, setOpenDialogMail] = useState(false); // State untuk mengontrol dialog
   const [loading, setLoading] = useState(true);
   const params = useParams();
-  const { boardId } = params as { id: string };
+  const boardId = params.boardId as string;
   const projectId = boardId; // Sesuaikan dengan nama parameter yang digunakan di route
-  const [email, setEmail] = useState("");
-  const [projectDetail, setProjectDetail] = useState<any>(null);
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const debouncedQuery = useDebounce(searchQuery, 300);
+  const [projectDetail, setProjectDetail] = useState<Project | null>(null);
+  const [teamMembers, setTeamMembers] = useState<User[]>([]);
   useEffect(() => {
     async function fetchProjectDetail() {
       setLoading(true);
@@ -138,9 +131,9 @@ export default function KanbanDashboard({
       setDescription("");
       setStatus("");
       setAssigneeId("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error creating task:", error);
-      toast.error(error.message || "Failed to create task");
+      toast.error(error instanceof Error ? error.message : "Failed to create task");
     }
   };
   const handleDragEnd = async (result: DropResult) => {
@@ -297,7 +290,6 @@ export default function KanbanDashboard({
                                 key={task.id}
                                 draggableId={task.id}
                                 index={index}
-                                className="bg-blue-600 hover:bg-blue-700 rounded-lg p-3 cursor-pointer transition-all border border-transparent hover:border-zinc-600"
                               >
                                 {(provided) => (
                                   <div
@@ -314,11 +306,7 @@ export default function KanbanDashboard({
                                     </p>
                                     <div className="flex justify-between items-center mt-2">
                                       <div className="text-xs text-zinc-400">
-                                        {task.dueDate
-                                          ? new Date(
-                                              task.dueDate
-                                            ).toLocaleDateString()
-                                          : "No due date"}
+                                        No due date
                                       </div>
                                       <Avatar className="h-6 w-6">
                                         <AvatarFallback>
@@ -484,7 +472,7 @@ export default function KanbanDashboard({
           <DropdownMenuContent className="w-56 bg-zinc-800 border-zinc-700 text-zinc-200">
             <DropdownMenuLabel className="flex items-center gap-3">
               <div className="bg-zinc-700 rounded-full p-2">
-                <User size={16} />
+                <UserIcon size={16} />
               </div>
               <div>
                 <p className="font-medium text-white">{session?.user?.name}</p>
@@ -495,7 +483,7 @@ export default function KanbanDashboard({
             <DropdownMenuSeparator className="bg-zinc-700" />
 
             <DropdownMenuItem className="flex items-center gap-3 hover:bg-zinc-700 cursor-pointer focus:bg-zinc-700">
-              <User size={16} className="text-zinc-400" />
+              <UserIcon size={16} className="text-zinc-400" />
               <span>Profile</span>
             </DropdownMenuItem>
 
